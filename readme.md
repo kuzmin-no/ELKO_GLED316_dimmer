@@ -50,6 +50,11 @@ It is likely that one of the Zigbee modules used is the [Telegesis ETRX357](http
 which costs approximately 26 EUR. Although I do not have this module, I do have a Raspberry Pi Pico W.
 Therefore, we can use the Pico W with WiFi and MQTT as an alternative to Zigbee.
 
+- [Connection diagram](./img/Connection_diagram.png)
+- [STL files for Raspberry Pi Pico case](./stl)
+- [GLED316 smartdim with Raspberry Pi Pico W top](./img/GLED316_smartdim1.png)
+- [GLED316 smartdim with Raspberry Pi Pico W side](./img/GLED316_smartdim2.png)
+
 I have uploaded an [example](./src/) of application that can be loaded onto the Raspberry Pi Pico W with [MicroPython](https://micropython.org/download/RPI_PICO_W/).
 The application consists of two parts:
 - [Folders structure](./img/Folders_structure.png)

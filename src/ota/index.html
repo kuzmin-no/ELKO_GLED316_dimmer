@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MQTT and wireless configuration</title>
+  <script>
+      let url = '/api/config';
+      fetch(url)
+      .then(res => res.json())
+      .then(out => {const { elements } = document.querySelector('form');
+                    for (const [ key, value ] of Object.entries(out) ) {
+                          const field = elements.namedItem(key)
+                          field && (field.value = value)
+                    }} ) 
+      .catch(err => console.log(err));
+
+      function restart() {
+        fetch("/api/restart")
+        .then(response => response.json())
+        .then(data => alert(data.state))
+        .catch(err => console.log(err));
+      }
+
+      function restart_in_main_app() {
+        fetch("/api/restart_in_main_app")
+        .then(response => response.json())
+        .then(data => alert(data.state))
+        .catch(err => console.log(err));
+      }
+
+      function power_on() {
+        fetch("/api/power_on")
+        .then(response => response.json())
+        .then(data => alert(data.state))
+        .catch(err => console.log(err));
+      }
+
+      function power_off() {
+        fetch("/api/power_off")
+        .then(response => response.json())
+        .then(data => alert(data.state))
+        .catch(err => console.log(err));
+      }
+
+  </script>
+</head>
+
+<body>
+
+<h1>MQTT and wireless configuration</h1>
+
+<form method="GET" action="/api/save_config">
+  <table>
+      <tr><td><label for="server">MQTT server:</label></td><td>
+      <input type="text" id="server" name="server"></td></tr>
+
+      <tr><td><label for="user">MQTT username:</label></td><td>
+      <input type="text" id="user" name="user"></td></tr>
+
+      <tr><td><label for="password">MQTT password:</label></td><td>
+      <input type="password" id="password" name="password"></td></tr>
+
+      <tr><td><label for="ssid">WiFi SSID:</label></td><td>
+      <input type="text" id="ssid" name="ssid"></td></tr>
+
+      <tr><td><label for="wifi_pw">WiFi password:</label></td><td>
+      <input type="password" id="wifi_pw" name="wifi_pw"></td></tr>
+  </table><br>
+  <input type="submit" value="Save configuration">
+</form>
+
+<br>
+
+<div>
+  <table>
+    <tr><td><button onClick=restart()>Restart in OTA mode</button></td><td>
+    <button onClick=restart_in_main_app()>Restart in main application</button></td></tr>
+    <tr><td><button onClick=power_on()>Dimmer power on</button></td><td>
+    <button onClick=power_off()>Dimmer power off</button></td></tr>
+  </table>
+</div>
+
+</body>
+</html>

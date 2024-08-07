@@ -15,7 +15,7 @@ Identical dimmers might have adapter boards for different modules.
 - [GLED316 sdcard adapter top](./img/GLED316_sdcard_adapter1.jpg)
 - [GLED316 sdcard adapter bottom](./img/GLED316_sdcard_adapter2.jpg)
 
-On the `SD-card` adapter board, there are labels marked RX and TX, which most likely indicate the UART link between the microcontroller and the Zigbee board.
+On the `SD-card` adapter board, there are labels marked `RX` and `TX`, which most likely indicate the UART link between the microcontroller and the Zigbee board.
 According to another label, the voltage level is +3 volts, so it can be directly connected to a UART-USB adapter to check the output.
 
 After connecting, we can discover that the dimmer communicate using a standard serial protocol with a speed of `115200` bps and `8N1` configuration.
@@ -67,10 +67,10 @@ The following service are available:
 - **FTP Service**: Accessible on standard port TCP/21, used to manually update or patch the main application.
 
 The following MicroPython examples and projects were used:
-- The main app is adapted from Renaud Guillon repository: https://github.com/rguillon/hatank
-- The captive portal DNS server is sourced from Patrick McAndrew's repository: https://github.com/urg/micropython-captive-dns-server
-- The web server is derived from Erik de Lange's repository: https://github.com/erikdelange/MicroPython-HTTP-Server
-- The FTP server is based on David Horton's repository: https://github.com/DavesCodeMusings/ftpdlite
+- The main app is adapted from Renaud Guillon [repository](https://github.com/rguillon/hatank)
+- The captive portal DNS server is sourced from Patrick McAndrew's [repository](https://github.com/urg/micropython-captive-dns-server)
+- The web server is derived from Erik de Lange's [repository](https://github.com/erikdelange/MicroPython-HTTP-Server)
+- The FTP server is based on David Horton's [repository](https://github.com/DavesCodeMusings/ftpdlite)
 
 Commands implemented for `telnet` service:
 
@@ -117,7 +117,7 @@ Below is an example of the /app/config.json file. You can create it manually and
 
 Here are the default values in the configuration structure and other possible parameters:
 
-```json
+```python
     config = {
         "client_id": hexlify(unique_id()),
         "server": None,
@@ -148,7 +148,7 @@ as described for the RES and LRN commands. The RES command will restart the devi
 This functionality is useful when the dimmer is already installed in place, and accessing the Raspberry Pi Pico USB port is difficult.
 
 The main application is designed to manage a single dimmer.
-Currently, the type and MQTT name of the device are hardcoded in the file /app/__init__.py, so you will need to edit this file accordingly.
+Currently, the type and MQTT name of the device are hardcoded in the file `/app/__init__.py`, so you will need to edit this file accordingly.
 
 
 Below is an example of how to change only the power state:
@@ -186,7 +186,7 @@ try:
                 asyncio.run(update())
 ```
 
-The MQTT service supports discovery; however, you can also define the following topics manually if needed. For example, with the MQTT device name "kitchen_benk":
+The MQTT service supports discovery; however, you can also define the following topics manually if needed. For example, with the MQTT device name `kitchen_benk`:
 
     homeassistant/light/kitchen_benk/set
     homeassistant/light/kitchen_benk/state

@@ -82,6 +82,8 @@ class MsgQueue:
 config = {
     "client_id": hexlify(unique_id()),
     "server": None,
+    "device_name": "test_device",
+    "device_type": "switch",
     "port": 0,
     "user": "",
     "password": "",

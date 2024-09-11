@@ -78,22 +78,29 @@ import ha_mqtt
 import ha_mqtt_light
 from drivers import BasicLightDriver, BrightnessLightDriver
 
-#light_mqtt = ha_mqtt_light.HaMqttBasicLight(name="kitchen_benk", light=BasicLightDriver(uart), pow_status=pow_status, dim_status=dim)
-light_mqtt = ha_mqtt_light.HaMqttBasicLight(name="bad_lys", light=BasicLightDriver(uart), pow_status=pow_status)
+if config["device_type"] == "switch":
+    light_mqtt = ha_mqtt_light.HaMqttBasicLight(name=config["device_name"], light=BasicLightDriver(uart), pow_status=pow_status)
+else:
+    light_mqtt = ha_mqtt_light.HaMqttBrightnessLight(name=config["device_name"], light=BrightnessLightDriver(uart), pow_status=pow_status, dim_status=dim)
 
 print('Starting loop...')
 try:
+#    asyncio.get_event_loop().run_forever()
     while True:
         asyncio.run(main())
         if uart.any() > 0:
             (pow, dim) = read_uart()
             pow_status = "ON" if pow == 1 else "OFF"
             print(f"Status change from dimmer - power: {pow_status} dimmer: {int((dim / 255) * 100)}%")
-#            if (light_mqtt.current_state['state'] != pow_status) or (light_mqtt.current_state['brightness'] != dim):
-            if light_mqtt.current_state['state'] != pow_status:
-                light_mqtt.current_state['state'] = pow_status
-#                light_mqtt.current_state['brightness'] = dim
-                asyncio.run(update())
+            if config["device_type"] == "switch":
+                if light_mqtt.current_state['state'] != pow_status:
+                    light_mqtt.current_state['state'] = pow_status
+                    asyncio.run(update())
+            else:
+                if (light_mqtt.current_state['state'] != pow_status) or (light_mqtt.current_state['brightness'] != dim):
+                    light_mqtt.current_state['state'] = pow_status
+                    light_mqtt.current_state['brightness'] = dim
+                    asyncio.run(update())
 except:
      reset()
 finally:

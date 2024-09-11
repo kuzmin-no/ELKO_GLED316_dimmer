@@ -113,6 +113,8 @@ Below is an example of the /app/config.json file. You can create it manually and
 ```json
     {
         "server": "IP address of MQTT server",
+        "device_name": "name_of_device",
+        "device_type": "switch or dimmer", 
         "user": "Username to accessing MQTT server",
         "password": "Password to accessing MQTT server",
         "ssid": "WLAN SSID to connecting in main application mode",
@@ -125,6 +127,8 @@ Here are the default values in the configuration structure and other possible pa
 ```python
     config = {
         "client_id": hexlify(unique_id()),
+        "device_name": "test_device",
+        "device_type": "switch",
         "server": None,
         "port": 0,
         "user": "",
@@ -151,45 +155,7 @@ Here are the default values in the configuration structure and other possible pa
 When running the main application, you can restart the device or enter in OTA mode by pressing the respective button/knob sequence,
 as described for the RES and LRN commands. The RES command will restart the device, while the LRN command will restart the device in OTA mode.
 This functionality is useful when the dimmer is already installed in place, and accessing the Raspberry Pi Pico USB port is difficult.
-
 The main application is designed to manage a single dimmer.
-Currently, the type and MQTT name of the device are hardcoded in the file `/app/__init__.py`, so you will need to edit this file accordingly.
-
-
-Below is an example of how to change only the power state:
-
-```python
-light_mqtt = ha_mqtt_light.HaMqttBasicLight(name="bad_lys", light=BasicLightDriver(uart), pow_status=pow_status)
-
-try:
-    while True:
-        asyncio.run(main())
-        if uart.any() > 0:
-            (pow, dim) = read_uart()
-            pow_status = "ON" if pow == 1 else "OFF"
-            print(f"Status change from dimmer - power: {pow_status} dimmer: {int((dim / 255) * 100)}%")
-            if light_mqtt.current_state['state'] != pow_status:
-                light_mqtt.current_state['state'] = pow_status
-                asyncio.run(update())
-```
-
-Here is an example of how to change both the power state and dimming:
-
-```python
-light_mqtt = ha_mqtt_light.HaMqttBasicLight(name="kitchen_benk", light=BasicLightDriver(uart), pow_status=pow_status, dim_status=dim)
-
-try:
-    while True:
-        asyncio.run(main())
-        if uart.any() > 0:
-            (pow, dim) = read_uart()
-            pow_status = "ON" if pow == 1 else "OFF"
-            print(f"Status change from dimmer - power: {pow_status} dimmer: {int((dim / 255) * 100)}%")
-            if (light_mqtt.current_state['state'] != pow_status) or (light_mqtt.current_state['brightness'] != dim):
-                light_mqtt.current_state['state'] = pow_status
-                ight_mqtt.current_state['brightness'] = dim
-                asyncio.run(update())
-```
 
 The MQTT service supports discovery; however, you can also define the following topics manually if needed. For example, with the MQTT device name `kitchen_benk`:
 
@@ -199,9 +165,9 @@ The MQTT service supports discovery; however, you can also define the following 
 The values must be in JSON format. For instance:
 
 ```json
-{ "state": "OFF" }
+{"state": "OFF"}
 
-{ "state": "ON", "brightness": 100 }
+{"state": "ON", "brightness": 100}
 ```
 
 The integration with Home Assistant is straightforward.  Please refer to this guide for [detailed instructions](https://www.home-assistant.io/integrations/mqtt/).
@@ -219,12 +185,11 @@ Below is an example configuration for [Homebridge Mqttthing](https://github.com/
             "getOn": "homeassistant/light/kitchen_benk/state",
             "setOn": "homeassistant/light/kitchen_benk/set"
         },
-        "onValue": "{ \"state\": \"ON\" }",
-        "offValue": "{ \"state\": \"OFF\" }",
+        "onValue": "{\"state\": \"ON\"}",
+        "offValue": "{\"state\": \"OFF\"}",
         "manufacturer": "ELKO",
         "model": "316 GLED",
         "firmwareRevision": "0.9.36"
-        },
-        "accessory": "mqttthing"
-    }
+    },
+    "accessory": "mqttthing"
 ```

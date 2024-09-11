@@ -53,6 +53,15 @@
 
 <form method="GET" action="/api/save_config">
   <table>
+      <tr><td><label for="server">Device name:</label></td><td>
+      <input type="text" id="device_name" name="device_name"></td></tr>
+      
+      <tr><td><label for="server">Device type:</label></td><td>
+      <select name="device_type" id="device_type">
+        <option value="switch">Switch</option>
+        <option value="dimmer">Dimmer</option>
+      </select>
+
       <tr><td><label for="server">MQTT server:</label></td><td>
       <input type="text" id="server" name="server"></td></tr>
 

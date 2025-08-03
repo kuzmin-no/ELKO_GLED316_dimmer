@@ -1,0 +1,37 @@
+esphome:
+  name: pico-test
+  friendly_name: pico-test
+
+rp2040:
+  board: rpipicow
+
+# Enable logging
+logger:
+
+
+uart:
+  tx_pin: GPIO4
+  rx_pin: GPIO5
+  baud_rate: 115200
+  debug:
+    direction: BOTH
+    dummy_receiver: true
+    after:
+      delimiter: "\n"
+    sequence:
+      - lambda: |-
+          UARTDebug::log_string(direction, bytes);
+          int powState=0;
+          int dimState=0;
+          std::string str(bytes.begin(), bytes.end());
+          if (sscanf(str.c_str(), "OK %d,%d", &powState, &dimState) == 2 ) {
+            id(elko_switch).publish_state(powState);
+          }
+
+switch:
+  - platform: uart
+    id: elko_switch
+    name: "Pico Test"
+    data:
+      turn_on: "POW 1\n"
+      turn_off: "POW 0\n"

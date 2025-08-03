@@ -1,0 +1,132 @@
+esphome:
+  includes:
+    - uart_read_line_sensor.h
+  on_boot: 
+    then:
+      uart.write: "\rSTA\r"
+
+rp2040:
+  board: rpipicow
+
+# Enable logging
+logger:
+
+globals:
+   - id: changing_state
+     type: bool
+     restore_value: no
+     initial_value: 'false'
+   - id: power_state
+     type: bool
+     restore_value: no
+     initial_value: 'false'
+   - id: brightness_state
+     type: float
+     restore_value: no
+     initial_value: '1.0'
+
+uart:
+  id: uart_bus
+  tx_pin: GPIO4
+  rx_pin: GPIO5
+  baud_rate: 115200
+  debug:
+    direction: TX
+    after:
+      delimiter: "\n"
+    sequence:
+      - lambda: |-
+          UARTDebug::log_string(direction, bytes);
+  
+text_sensor:
+- platform: custom
+  lambda: |-
+    auto my_custom_sensor = new UartReadLineSensor(id(uart_bus));
+    App.register_component(my_custom_sensor);
+    return {my_custom_sensor};
+  text_sensors:
+    id: "uart_readline"
+    on_value:
+      then:
+        - lambda: |-
+            int powState=0;
+            int dimState=0;
+            if (sscanf(x.c_str(), "OK %d,%d\r", &powState, &dimState) == 2) {
+              // Update global state
+              id(power_state) = bool(powState);
+              id(brightness_state) = dimState / 100.0f;
+            }
+            // Make sure that dimmer is not changing its state from HA
+            if (not id(changing_state)) {
+              // Update dimmer state if it was turned on/off/dimmed manually
+              if (id(dimmer).remote_values.is_on() && (not id(power_state))) {
+                ESP_LOGV("text_sensor", "turn_off");
+                id(dimmer).turn_off().perform();
+              } else if ((not id(dimmer).remote_values.is_on()) && id(power_state)) {
+                ESP_LOGV("text_sensor", "turn_on");
+                auto call = id(dimmer).turn_on();
+                if (id(dimmer).remote_values.get_brightness() != id(brightness_state)) {
+                  call.set_brightness(id(brightness_state));
+                  ESP_LOGV("text_sensor", "set_brightness %.2f", id(brightness_state));
+                }
+                call.perform();
+              } else {
+                if (id(dimmer).remote_values.get_brightness() != id(brightness_state)) {
+                  auto call = id(dimmer).make_call();
+                  call.set_brightness(id(brightness_state));
+                  call.perform();
+                  ESP_LOGV("text_sensor", "set_brightness %.2f", id(brightness_state));   
+                }
+              }
+            }
+
+light:
+  - platform: status_led
+    pin: LED
+    id: dimmer_status_led
+    name: "Status LED"
+    internal: true
+  - platform: monochromatic
+    name: $friendly_name
+    output: dimmer_output
+    id: dimmer
+    default_transition_length: 0s
+    on_state:
+      then:
+        - logger.log:
+            level: VERBOSE
+            format: "Dimmer state %d and brightness %f"
+            args: [ 'id(dimmer).remote_values.is_on()', 'id(dimmer).remote_values.get_brightness()' ]
+        - globals.set:
+            id: changing_state
+            value: 'true'
+        - uart.write: !lambda
+            char buf[16];
+            buf[0] = '\0';
+            if (id(dimmer).remote_values.is_on() && (not id(power_state))) {
+              sprintf(buf, "\rPOW 1\r");
+              id(dimmer_status_led).turn_on().perform();
+            } else if ((not id(dimmer).remote_values.is_on()) && id(power_state)) {
+              sprintf(buf, "\rPOW 0\r");
+              id(dimmer_status_led).turn_off().perform();
+            } else if (id(dimmer).remote_values.get_brightness() != id(brightness_state)) {
+              sprintf(buf, "\rDIM %d\r", int(round(id(dimmer).remote_values.get_brightness() * 100.0f)));
+            }
+            std::string s = buf;
+            return std::vector<unsigned char>( s.begin(), s.end() );
+        - globals.set:
+            id: changing_state
+            value: 'false'
+
+output:
+  - platform: template
+    type: float
+    id: dimmer_output
+    write_action:
+      then:
+        - lambda: |-
+            if (id(dimmer).remote_values.is_on()) {
+              id(dimmer_status_led).turn_on().perform();
+            } else {
+              id(dimmer_status_led).turn_off().perform();
+            }

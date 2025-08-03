@@ -5,7 +5,7 @@ It is recommended to use ESPHome if you have a Home Assistant deployment.
 
 I have uploaded an [example](./src/) of application that can be loaded onto the Raspberry Pi Pico W with [MicroPython](https://micropython.org/download/RPI_PICO_W/).
 The application consists of two parts:
-- [Folders structure](../img/Folders_structure.png)
+- [Folders structure](./img/Folders_structure.png)
 - `/app` folder, which contains the main application.
 - `/ota` folder, which includes services and utilities that may assist with upgrading and troubleshooting the application.
 
@@ -37,7 +37,7 @@ Commands implemented for `telnet` service:
 The web service allows for creating a configuration file and managing the dimmer via API.
 Below is a screenshot of the web interface:
 
-- [Web interface](../img/Web_service.png)
+- [Web interface](./img/Web_service.png)
 
 Here is a list of implemented APIs. All requests must use the GET method and provide parameters via the query string:
 

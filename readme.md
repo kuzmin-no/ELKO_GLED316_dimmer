@@ -47,8 +47,9 @@ In these cases, the dimmer sends the following commands to the Zigbee module:
 | LRN     | Zigbee pairing mode           | Press small "push button" for apporx 10 seconds, when LED flashes release "push button" and press dimmer knob.  |
 
 It is likely that one of the Zigbee modules used is the [Telegesis ETRX357](https://eu.mouser.com/datasheet/2/368/TG_PM_0511_ETRX358x_LRS-3083307.pdf),
-which costs approximately 26 EUR. Although I do not have this module, I do have a Raspberry Pi Pico W.
-Therefore, we can use the Pico W or ESP32 with [ESPHome](https://esphome.io/index.html) as an alternative to Zigbee.
+which costs approximately 26 EUR. Although I do not have this module, but we can use any [ESPHome](https://esphome.io/index.html) compatible microcontroller.
+I have tested Raspberry Pi Pico W and ESP-12F. It is easy to develop and debug on Raspberry Pi Pico W, but ESP-12F module has almost
+the same dimensions as the original Zigbee modules, and ESP platform supports captive portal.
 
 - [Connection diagram](./img/Connection_diagram.png)
 - [STL files for Raspberry Pi Pico case](./stl)
@@ -59,3 +60,9 @@ There are examples of ESPhome configuration for ELKO dimmer as:
 - [Switch](./ESPhome/ELKO_switch.yaml)
 - [Light Binary](./ESPhome/ELKO_light-binary.yaml)
 - [Light Monochromatic](./ESPhome/ELKO_light-monochromatic.yaml)
+
+These examples also implement RES and LRN commands mentioned above: 
+- RES - Restarts the ESPHome device.
+- LRN - Start the  ESPHome device in AP mode for adjust Wi-Fi configuration or upload an OTA update.
+When in AP mode, the ESPHome device will automatically restart into standard mode after 10 minutes,
+or you can use the RES command to restart it manually.

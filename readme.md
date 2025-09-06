@@ -1,5 +1,7 @@
 # Making ELKO 316 GLED dimmer smart (again)
 
+NB! The previous Micropython version of application moved to [Archive](./archive) folder.
+
 [ELKO RS16/316 GLED dimmer](https://www.elko.no/produkter/14-brytere-og-dimmere/dimmere/elko-rs/polarhvit/rs16-316-gled-dimmer-ph)
 is superb two-pole dimmer with the ability to switch between leading edge (GLI) and trailing edge (GLE) dimming.
 The dimmer includes an embedded `ATxmega32E5` microcontroller, with firmware that can be upgraded using an integrated micro-SD card reader.
